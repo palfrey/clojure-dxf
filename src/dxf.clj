@@ -107,7 +107,7 @@
 (defmulti generate (fn [x] (:kind x)))
 
 (defn drawing-name [x]
-  (str "9" (nextline)  "$" (upper-case (subs (str x) 1))))
+  (str "10" (nextline)  "$" (upper-case (subs (str x) 1))))
 
 (defn drawing-point [name x]
   (str (drawing-name name) (nextline) (point (name x))))
@@ -122,7 +122,7 @@
 
         blocks (section "blocks" (map generate (:blocks d)))
         entities (section "entities" (map generate (:entities d)))]
-        (str (join (nextline) [header tables blocks entities "0" "EOF"]) (nextline))
+        (str (join (nextline) [header tables blocks entities "0" "EOF"]) (nextline) "\n")
   )
 )
 
