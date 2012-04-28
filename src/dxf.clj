@@ -48,6 +48,21 @@
    :entities []
    })
 
+(defn Entity []
+  {
+   :layer "PYDXF"
+  }
+)
+
+(defn Face []
+  (merge (Entity) {
+   :kind :face
+   :points []
+   }))
+
+(defn addItem [e key item]
+  (assoc e key (conj (key e) item)))
+
 (defn nextline [] "\r\n")
 
 (defn section [name x]
@@ -99,10 +114,13 @@
                   (nth x %)
                 )
               (range (count x))
-            )
+             )
         )
   ))
 )
+
+(defn points [p]
+  (join (nextline) (map #(point (nth p %) %) (range (count p)))))
 
 (defmulti generate (fn [x] (:kind x)))
 
@@ -158,4 +176,19 @@
     "72" (nextline) "65" (nextline)
     "73" (nextline) (count (:elements l)) (nextline)
     "40" (nextline) "0.0"))
+
+(defn common [c]
+  (let [parent (:parent c c)]
+    (str "8" (nextline) (:layer parent)
+        (if (contains? parent :color) (str (nextline) "62" (nextline) (:color parent)) "")
+        (if (contains? parent :extrusion) (str (nextline) (point (:extrusion parent) 200)))
+        (if (contains? parent :lineType) (str (nextline) "6" (nextline) (:lineType parent)))
+        (if (contains? parent :lineWeight) (str (nextline) "370" (nextline) (:lineWeight parent)))
+        (if (contains? parent :lineTypeScale) (str (nextline) "48" (nextline) (:lineTypeScale parent)))
+        (if (contains? parent :thickness) (str (nextline) "39" (nextline) (:thickness parent)))
+    )))
+
+(defmethod generate :face [f]
+  (join (nextline) ["0" "3DFACE" (common f)
+                         (points (:points f))]))
 

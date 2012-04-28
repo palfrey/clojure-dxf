@@ -34,3 +34,7 @@
 
 (deftest drawing
     (is (cmpDxf (Drawing) "drawing.py")))
+
+(deftest face
+    (let [f (assoc (assoc (Face) :points [[0,0,0],[1,0,0],[1,1,0],[0,1,0]]) :color 4)]
+      (is (cmpDxf (addItem (Drawing) :entities f) "face.py"))))
