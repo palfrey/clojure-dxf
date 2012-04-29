@@ -46,3 +46,9 @@
         f (assoc (assoc (Face) :points [[0,0,0],[1,0,0],[1,1,0],[0,1,0]]) :color 4)
        ]
       (is (cmpDxf (addItem (Drawing) :entities f) "face.py"))))
+
+(deftest circle
+  (let [
+        c (assoc (assoc (Circle) :center [1,1,0]) :color 3)
+       ]
+      (is (cmpDxf (addItem (Drawing) :entities c) "circle.py"))))

@@ -60,6 +60,13 @@
    :points []
    }))
 
+(defn Circle []
+  (merge (Entity) {
+   :kind :circle
+   :center [0,0,0]
+   :radius 1
+  }))
+
 (defn addItem [e key item]
   (assoc e key (conj (key e) item)))
 
@@ -201,5 +208,13 @@
     "0" "3DFACE"
     (common f)
     (points (:points f))
+  ]))
+
+(defmethod generate :circle [c]
+  (join (nextline) [
+    "0" "CIRCLE"
+    (common c)
+    (point (:center c))
+    "40" (:radius c)
   ]))
 
