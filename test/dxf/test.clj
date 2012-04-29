@@ -52,3 +52,9 @@
         c (assoc (assoc (Circle) :center [1,1,0]) :color 3)
        ]
       (is (cmpDxf (addItem (Drawing) :entities c) "circle.py"))))
+
+(deftest line
+  (let [
+        l (assoc (Line) :points [[0,0,0],[1,1,1]])
+       ]
+      (is (cmpDxf (addItem (Drawing) :entities l) "line.py"))))

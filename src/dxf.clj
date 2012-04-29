@@ -67,6 +67,12 @@
    :radius 1
   }))
 
+(defn Line []
+  (merge (Entity) {
+   :kind :line
+   :points []
+   }))
+
 (defn addItem [e key item]
   (assoc e key (conj (key e) item)))
 
@@ -216,5 +222,12 @@
     (common c)
     (point (:center c))
     "40" (:radius c)
+  ]))
+
+(defmethod generate :line [l]
+  (join (nextline) [
+    "0" "LINE"
+    (common l)
+    (points (:points l))
   ]))
 
