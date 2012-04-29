@@ -68,16 +68,17 @@
 (defn section [name x]
   (let
     [xstr (
-           if (or (nil? x) (= (count x) 0))
-          ""
-           (str (nextline) (join (nextline) x))
+            if
+            (or (nil? x) (= (count x) 0))
+            []
+            [(join (nextline) x)]
            )
      ]
-    (str 
-      "0" (nextline) "SECTION" (nextline)
-      "2" (nextline) (upper-case name)
-      xstr (nextline)
-      "0" (nextline) "ENDSEC"
+    (join (nextline) (concat [
+      "0" "SECTION" 
+      "2" (upper-case name)]
+      xstr
+      ["0" "ENDSEC"])
     )
   )
 )
@@ -85,22 +86,28 @@
 (defn table [name x]
   (let
     [
-     xstr (if (or (nil? x) (= (count x) 0)) "" (str (nextline) (join (nextline) x)))
+     xstr (if
+            (or (nil? x) (= (count x) 0))
+            []
+            [(join (nextline) x)]
+          )
      xlen (if (nil? x) (0) (count x))
     ]
-    (str
-      "0" (nextline) "TABLE" (nextline)
-      "2" (nextline) (upper-case name) (nextline)
-      "70" (nextline) xlen xstr (nextline)
-      "0" (nextline) "ENDTAB")
+    (join (nextline) (concat [
+      "0" "TABLE"
+      "2" (upper-case name) 
+      "70" xlen]
+      xstr
+      ["0" "ENDTAB"])
+    )
   )
 )
 
 (defn acadver []
-  (str
-    "9" (nextline) "$ACADVER" (nextline)
-    "1" (nextline) "AC1006"
-  )
+  (join (nextline) [
+    "9" "$ACADVER"
+    "1" "AC1006"
+  ])
 )
 
 (defn point
@@ -125,7 +132,7 @@
 (defmulti generate (fn [x] (:kind x)))
 
 (defn drawing-name [x]
-  (str "10" (nextline)  "$" (upper-case (subs (str x) 1))))
+  (str "10" (nextline) "$" (upper-case (subs (str x) 1))))
 
 (defn drawing-point [name x]
   (str (drawing-name name) (nextline) (point (name x))))
@@ -145,37 +152,38 @@
 )
 
 (defmethod generate :layer [l]
-  (str
-    "0" (nextline) "LAYER" (nextline)
-    "2" (nextline) (upper-case (:name l)) (nextline)
-    "70" (nextline) (:flag l) (nextline)
-    "62" (nextline) (:color l) (nextline)
-    "6" (nextline) (:lineType l)
-  ))
+  (join (nextline) [
+    "0" "LAYER"
+    "2" (upper-case (:name l))
+    "70" (:flag l)
+    "62" (:color l)
+    "6" (:lineType l)
+  ]))
 
 (defmethod generate :style [s]
-    (str
-      "0" (nextline) "STYLE" (nextline)
-      "2" (nextline) (upper-case (:name s)) (nextline)
-      "70" (nextline) (:flag s) (nextline)
-      "40" (nextline) (:flag s) (nextline)
-      "41" (nextline) (:widthFactor s) (nextline)
-      "50" (nextline) (:obliqueAngle s) (nextline)
-      "71" (nextline) (:mirror s) (nextline)
-      "42" (nextline) (:lastHeight s) (nextline)
-      "3" (nextline) (upper-case (:font s)) (nextline)
-      "4" (nextline) (upper-case (:bigFont s))
-    ))
+    (join (nextline) [
+      "0" "STYLE" 
+      "2" (upper-case (:name s))
+      "70" (:flag s)
+      "40" (:flag s)
+      "41" (:widthFactor s)
+      "50" (:obliqueAngle s)
+      "71" (:mirror s) 
+      "42" (:lastHeight s)
+      "3" (upper-case (:font s))
+      "4" (upper-case (:bigFont s))
+    ]))
 
 (defmethod generate :linetype [l]
-  (str
-    "0" (nextline) "LTYPE" (nextline)
-    "2" (nextline) (upper-case (:name l)) (nextline)
-    "70" (nextline) (:flag l) (nextline)
-    "3" (nextline) (:description l) (nextline)
-    "72" (nextline) "65" (nextline)
-    "73" (nextline) (count (:elements l)) (nextline)
-    "40" (nextline) "0.0"))
+  (join (nextline) [
+    "0" "LTYPE"
+    "2" (upper-case (:name l))
+    "70" (:flag l)
+    "3" (:description l)
+    "72" "65"
+    "73" (count (:elements l))
+    "40" "0.0"
+  ]))
 
 (defn common [c]
   (let [parent (:parent c c)]
@@ -189,6 +197,9 @@
     )))
 
 (defmethod generate :face [f]
-  (join (nextline) ["0" "3DFACE" (common f)
-                         (points (:points f))]))
+  (join (nextline) [
+    "0" "3DFACE"
+    (common f)
+    (points (:points f))
+  ]))
 
