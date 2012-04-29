@@ -73,6 +73,14 @@
    :points []
    }))
 
+(defn Text []
+  (merge (Entity) {
+    :kind :text
+    :text ""
+    :point [0,0,0]
+    :height 1
+    }))
+
 (defn addItem [e key item]
   (assoc e key (conj (key e) item)))
 
@@ -230,4 +238,23 @@
     (common l)
     (points (:points l))
   ]))
+
+(defmethod generate :text [t]
+  (str
+    (join (nextline) [
+      "0" "TEXT"
+      (common t)
+      (point (:point t))
+      "40" (:height t)
+      "1" (:text t)
+      ])
+    (if (contains? t :rotation) (str (nextline) "50" (:rotation t)) "")
+    (if (contains? t :xscale) (str (nextline) "41" (:xscale t)) "")
+    (if (contains? t :obliqueAngle) (str (nextline) "51" (:obliqueAngle t)) "")
+    (if (contains? t :style) (str (nextline) "7" (nextline) (upper-case (:name (:style t)))) "")
+    (if (contains? t :flag) (str (nextline) "71" (nextline) (:flag t)) "")
+    (if (contains? t :justifyhor) (str (nextline) "72" (nextline) (:justifyhor t)) "")
+    (if (contains? t :alignment) (str (nextline) (point (:alignment t) 1)) "")
+    (if (contains? t :justifyver) (str (nextline) "73" (nextline) (:justifyver t)) "")
+  ))
 

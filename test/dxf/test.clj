@@ -58,3 +58,9 @@
         l (assoc (Line) :points [[0,0,0],[1,1,1]])
        ]
       (is (cmpDxf (addItem (Drawing) :entities l) "line.py"))))
+
+(deftest text
+  (let [
+        t (assoc (assoc (Text) :text "Please donate!") :point [3,0,1])
+       ]
+      (is (cmpDxf (addItem (Drawing) :entities t) "text.py"))))
