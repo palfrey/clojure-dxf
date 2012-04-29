@@ -64,3 +64,9 @@
         t (assoc (assoc (Text) :text "Please donate!") :point [3,0,1])
        ]
       (is (cmpDxf (addItem (Drawing) :entities t) "text.py"))))
+
+(deftest solid
+  (let [
+        s (assoc (assoc (Solid) :points [[4,4,0],[5,4,0],[7,8,0],[9,9,0]]) :color 3)
+       ]
+      (is (cmpDxf (addItem (Drawing) :entities s) "solid.py"))))

@@ -73,6 +73,12 @@
    :points []
    }))
 
+(defn Solid []
+  (merge (Entity) {
+   :kind :solid
+   :points []
+   }))
+
 (defn Text []
   (merge (Entity) {
     :kind :text
@@ -257,4 +263,14 @@
     (if (contains? t :alignment) (str (nextline) (point (:alignment t) 1)) "")
     (if (contains? t :justifyver) (str (nextline) "73" (nextline) (:justifyver t)) "")
   ))
+
+(defmethod generate :solid [s]
+  (join (nextline) [
+      "0" "SOLID"
+      (common s)
+      (point (nth (:points s) 0) 0)
+      (point (nth (:points s) 1) 1)
+      (point (nth (:points s) 3) 2)
+      (point (nth (:points s) 2) 3)
+  ]))
 
