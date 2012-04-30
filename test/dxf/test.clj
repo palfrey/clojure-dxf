@@ -70,3 +70,17 @@
         s (assoc (assoc (Solid) :points [[4,4,0],[5,4,0],[7,8,0],[9,9,0]]) :color 3)
        ]
       (is (cmpDxf (addItem (Drawing) :entities s) "solid.py"))))
+
+(deftest rectangle
+  (let [
+        r (merge (Rectangle) 
+                 {
+                  :point [2,2,2]
+                  :width 4
+                  :height 3
+                  :color 6
+                  :solid (assoc (Solid) :color 2)
+                }
+              )
+       ]
+      (is (cmpDxf (addItem (Drawing) :entities r) "rectangle.py"))))

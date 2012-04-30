@@ -87,6 +87,15 @@
     :height 1
     }))
 
+(defn Rectangle []
+  (merge (Entity) {
+    :kind :rectangle
+    :point [0,0,0]
+    :width 1
+    :height 1
+    :line 1
+    }))
+
 (defn addItem [e key item]
   (assoc e key (conj (key e) item)))
 
@@ -274,3 +283,33 @@
       (point (nth (:points s) 2) 3)
   ]))
 
+(defmethod generate :rectangle [r]
+  (let [p (:point r)
+       points [
+               p
+               [(+ (nth p 0) (:width r)) (nth p 1) (nth p 2)]
+               [(+ (nth p 0) (:width r)) (+ (nth p 1) (:height r)) (nth p 2)]
+               [(nth p 0) (+ (nth p 1) (:height r)) (nth p 2)]
+              p]
+        ]
+    (subs (str
+         (if (contains? r :solid)
+           (str (nextline)
+               (generate
+                 (merge
+                   (Solid)
+                   {
+                    :points (subvec points 0 (- (count points) 1))
+                    :parent (:solid r)
+                    }
+                  )
+                )
+            )
+            ""
+        )
+
+        (if (contains? r :line) 
+            (join "" (map #(str (nextline) (generate (merge (Line) {:points [(nth points %) (nth points (+ % 1))] :parent r}))) (range 4)))
+        )
+      ) 1)
+  ))
