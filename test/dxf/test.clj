@@ -84,3 +84,6 @@
               )
        ]
       (is (cmpDxf (addItem (Drawing) :entities r) "rectangle.py"))))
+
+(deftest style
+  (is (cmpDxf (addItem (Drawing) :styles (Style)) "style.py")))
