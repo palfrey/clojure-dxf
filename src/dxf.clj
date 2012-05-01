@@ -96,6 +96,12 @@
     :line 1
     }))
 
+(defn Insert []
+  (merge (Entity) {
+    :kind :insert
+    :point [0,0,0]
+  }))
+
 (defn addItem [e key item]
   (assoc e key (conj (key e) item)))
 
@@ -313,3 +319,23 @@
         )
       ) 1)
   ))
+
+(defmethod generate :insert [i]
+  (str
+    (join (nextline) [
+        "0" "INSERT"
+        "2" (:name i)
+        (common i)
+        (point (:point i))
+    ])
+      (if (contains? i :xscale) (str (nextline) "41" (nextline) (:xscale i)) "")
+      (if (contains? i :yscale) (str (nextline) "42" (nextline) (:yscale i)) "")
+      (if (contains? i :zscale) (str (nextline) "43" (nextline) (:zscale i)) "")
+      (if (contains? i :rotation) (str (nextline) "50" (nextline) (:rotation i)) "")
+      (if (contains? i :cols) (str (nextline) "70" (nextline) (:cols i)) "")
+      (if (contains? i :colspacing) (str (nextline) "44" (nextline) (:colspacing i)) "")
+      (if (contains? i :rows) (str (nextline) "71" (nextline) (:rows i)) "")
+      (if (contains? i :rowspacing) (str (nextline) "45" (nextline) (:rowspacing i)) "")
+    )
+  )
+

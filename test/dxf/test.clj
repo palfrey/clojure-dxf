@@ -87,3 +87,16 @@
 
 (deftest style
   (is (cmpDxf (addItem (Drawing) :styles (Style)) "style.py")))
+
+(deftest insert
+  (let [
+    i (merge (Insert)
+             {
+              :name "test"
+              :point [3,3,3]
+              :cols 5
+              :colspacing 2
+              }
+        )
+      ]
+  (is (cmpDxf (addItem (Drawing) :entities i) "insert.py"))))
