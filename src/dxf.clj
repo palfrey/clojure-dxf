@@ -1,5 +1,5 @@
 (ns dxf
-  (:use [clojure.string :only [join upper-case]])
+  (:use [clojure.string :only [join upper-case split-lines]])
   )
 
 (defn Style []
@@ -100,6 +100,16 @@
   (merge (Entity) {
     :kind :insert
     :point [0,0,0]
+  }))
+
+(defn Mtext []
+  (merge (Text) {
+    :kind :mtext
+    :text ""
+    :point [0,0,0]
+    :width 250
+    :spacingFactor 1.5
+    :down false
   }))
 
 (defn addItem [e key item]
@@ -342,3 +352,54 @@
     )
   )
 
+(defmethod generate :mtext [m]
+  (let [
+        texts (#(if (:down m) % (reverse %)) (split-lines (:text m)))
+        sw (if
+             (contains-not-null m :spacingWidth)
+             (:spacingWidth m)
+             (* (:height m)
+                (if
+                  (:down m)
+                  (* -1 (:spacingFactor m))
+                  (:spacingFactor m)
+                )
+             )
+           )
+       ]
+      (loop [result "" x 0 y 0 t texts]
+        (if (= (count t) 0)
+          (subs result 1)
+          (recur
+            (str result (nextline)
+              (generate (merge (Text)
+                {
+                  :text (subs (first t) 0 (min (count (first t)) (:width m)))
+                  :point [(+ (nth (:point m) 0) (* x sw))
+                          (+ (nth (:point m) 1) (* y sw))
+                          (nth (:point m) 2)
+                          ]
+                  :alignment (:alignment m)
+                  :flag (:flag m)
+                  :height (:height m)
+                  :justifyhor (:justifyhor m)
+                  :justifyver (:justifyver m)
+                  :rotation (:rotation m)
+                  :obliqueAngle (:obliqueAngle m)
+                  :style (:style m)
+                  :xscale (:xscale m)
+                  :parent m
+                }
+              ))
+            )
+            (if (:rotation m) (+ x 1) x)
+            (if (:rotation m) y (+ y 1))
+            (if (<= (count (first t)) (:width m))
+                (rest t)
+                (cons (subs (first t) (:width m)) (rest t))
+            )
+          )
+        )
+      )
+    )
+)

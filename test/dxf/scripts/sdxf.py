@@ -362,7 +362,7 @@ class Text(_Entity):
 
 class Mtext(Text):
     """Surrogate for mtext, generates some Text instances."""
-    def __init__(self,text='',point=(0,0,0),width=250,spacingFactor=1.5,down=0,spacingWidth=None,**options):
+    def __init__(self,text='',point=(0,0,0),width=250,spacingFactor=1.5,down=False,spacingWidth=None,**options):
         Text.__init__(self,text=text,point=point,**options)
         if down:spacingFactor*=-1
         self.spacingFactor=spacingFactor
@@ -370,7 +370,7 @@ class Mtext(Text):
         self.width=width
         self.down=down
     def __str__(self):
-        texts=self.text.replace('\r\n', '\n').split(newline)
+        texts=self.text.split(newline)
         if not self.down:texts.reverse()
         result=''
         x=y=0

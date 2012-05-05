@@ -100,3 +100,16 @@
         )
       ]
   (is (cmpDxf (addItem (Drawing) :entities i) "insert.py"))))
+
+(deftest mtext
+  (let [
+    m (merge (Mtext)
+             {
+                :text (str "Click on Ads" (nextline) "multiple lines with mtext")
+                :point [1,1,1]
+                :color 5
+                :rotation 90
+              }
+        )
+      ]
+  (is (cmpDxf (addItem (Drawing) :entities m) "mtext.py"))))
