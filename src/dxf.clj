@@ -227,15 +227,18 @@
     "40" "0.0"
   ]))
 
+(defn contains-not-null [m k]
+  (and (contains? m k) (not= nil (k m))))
+
 (defn common [c]
   (let [parent (:parent c c)]
     (str "8" (nextline) (:layer parent)
-        (if (contains? parent :color) (str (nextline) "62" (nextline) (:color parent)) "")
-        (if (contains? parent :extrusion) (str (nextline) (point (:extrusion parent) 200)))
-        (if (contains? parent :lineType) (str (nextline) "6" (nextline) (:lineType parent)))
-        (if (contains? parent :lineWeight) (str (nextline) "370" (nextline) (:lineWeight parent)))
-        (if (contains? parent :lineTypeScale) (str (nextline) "48" (nextline) (:lineTypeScale parent)))
-        (if (contains? parent :thickness) (str (nextline) "39" (nextline) (:thickness parent)))
+        (if (contains-not-null parent :color) (str (nextline) "62" (nextline) (:color parent)) "")
+        (if (contains-not-null parent :extrusion) (str (nextline) (point (:extrusion parent) 200)))
+        (if (contains-not-null parent :lineType) (str (nextline) "6" (nextline) (:lineType parent)))
+        (if (contains-not-null parent :lineWeight) (str (nextline) "370" (nextline) (:lineWeight parent)))
+        (if (contains-not-null parent :lineTypeScale) (str (nextline) "48" (nextline) (:lineTypeScale parent)))
+        (if (contains-not-null parent :thickness) (str (nextline) "39" (nextline) (:thickness parent)))
     )))
 
 (defmethod generate :face [f]
@@ -269,14 +272,14 @@
       "40" (:height t)
       "1" (:text t)
       ])
-    (if (contains? t :rotation) (str (nextline) "50" (:rotation t)) "")
-    (if (contains? t :xscale) (str (nextline) "41" (:xscale t)) "")
-    (if (contains? t :obliqueAngle) (str (nextline) "51" (:obliqueAngle t)) "")
-    (if (contains? t :style) (str (nextline) "7" (nextline) (upper-case (:name (:style t)))) "")
-    (if (contains? t :flag) (str (nextline) "71" (nextline) (:flag t)) "")
-    (if (contains? t :justifyhor) (str (nextline) "72" (nextline) (:justifyhor t)) "")
-    (if (contains? t :alignment) (str (nextline) (point (:alignment t) 1)) "")
-    (if (contains? t :justifyver) (str (nextline) "73" (nextline) (:justifyver t)) "")
+    (if (contains-not-null t :rotation) (str (nextline) "50" (nextline) (:rotation t)) "")
+    (if (contains-not-null t :xscale) (str (nextline) "41" (nextline) (:xscale t)) "")
+    (if (contains-not-null t :obliqueAngle) (str (nextline) "51" (nextline) (:obliqueAngle t)) "")
+    (if (contains-not-null t :style) (str (nextline) "7" (nextline) (upper-case (:name (:style t)))) "")
+    (if (contains-not-null t :flag) (str (nextline) "71" (nextline) (:flag t)) "")
+    (if (contains-not-null t :justifyhor) (str (nextline) "72" (nextline) (:justifyhor t)) "")
+    (if (contains-not-null t :alignment) (str (nextline) (point (:alignment t) 1)) "")
+    (if (contains-not-null t :justifyver) (str (nextline) "73" (nextline) (:justifyver t)) "")
   ))
 
 (defmethod generate :solid [s]
@@ -299,7 +302,7 @@
               p]
         ]
     (subs (str
-         (if (contains? r :solid)
+         (if (contains-not-null r :solid)
            (str (nextline)
                (generate
                  (merge
@@ -314,7 +317,7 @@
             ""
         )
 
-        (if (contains? r :line) 
+        (if (contains-not-null r :line) 
             (join "" (map #(str (nextline) (generate (merge (Line) {:points [(nth points %) (nth points (+ % 1))] :parent r}))) (range 4)))
         )
       ) 1)
@@ -328,14 +331,14 @@
         (common i)
         (point (:point i))
     ])
-      (if (contains? i :xscale) (str (nextline) "41" (nextline) (:xscale i)) "")
-      (if (contains? i :yscale) (str (nextline) "42" (nextline) (:yscale i)) "")
-      (if (contains? i :zscale) (str (nextline) "43" (nextline) (:zscale i)) "")
-      (if (contains? i :rotation) (str (nextline) "50" (nextline) (:rotation i)) "")
-      (if (contains? i :cols) (str (nextline) "70" (nextline) (:cols i)) "")
-      (if (contains? i :colspacing) (str (nextline) "44" (nextline) (:colspacing i)) "")
-      (if (contains? i :rows) (str (nextline) "71" (nextline) (:rows i)) "")
-      (if (contains? i :rowspacing) (str (nextline) "45" (nextline) (:rowspacing i)) "")
+      (if (contains-not-null i :xscale) (str (nextline) "41" (nextline) (:xscale i)) "")
+      (if (contains-not-null i :yscale) (str (nextline) "42" (nextline) (:yscale i)) "")
+      (if (contains-not-null i :zscale) (str (nextline) "43" (nextline) (:zscale i)) "")
+      (if (contains-not-null i :rotation) (str (nextline) "50" (nextline) (:rotation i)) "")
+      (if (contains-not-null i :cols) (str (nextline) "70" (nextline) (:cols i)) "")
+      (if (contains-not-null i :colspacing) (str (nextline) "44" (nextline) (:colspacing i)) "")
+      (if (contains-not-null i :rows) (str (nextline) "71" (nextline) (:rows i)) "")
+      (if (contains-not-null i :rowspacing) (str (nextline) "45" (nextline) (:rowspacing i)) "")
     )
   )
 
