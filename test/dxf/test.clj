@@ -113,3 +113,7 @@
         )
       ]
   (is (cmpDxf (addItem (Drawing) :entities m) "mtext.py"))))
+
+(deftest block
+  (let [b (assoc (Block) :name "test")]
+    (is (cmpDxf (addItem (Drawing) :blocks b) "block.py"))))

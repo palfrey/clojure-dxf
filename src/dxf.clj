@@ -112,6 +112,17 @@
     :down false
   }))
 
+(defn Block []
+  {
+    :kind :block
+    :name ""
+    :layer "PYDXF"
+    :flag 0
+    :base [0,0,0]
+    :entities []
+   }
+)
+
 (defn addItem [e key item]
   (assoc e key (conj (key e) item)))
 
@@ -403,3 +414,23 @@
       )
     )
 )
+
+(defmethod generate :block [b]
+  (let [
+        e (join (nextline) (map generate (:entities b)))
+        ]
+    (join (nextline)
+      [
+        "0" "BLOCK"
+        "8" (:layer b)
+        "2" (upper-case (:name b))
+        "70" (:flag b)
+        (point (:base b))
+        "3" (upper-case (:name b))
+        e
+        "0" "ENDBLK"
+      ]
+    )
+  )
+)
+
