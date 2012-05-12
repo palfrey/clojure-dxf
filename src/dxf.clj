@@ -123,6 +123,34 @@
    }
 )
 
+(defn View []
+  {
+    :kind :view
+    :name ""
+    :flag 0
+    :width 1
+    :height 1
+    :center [0.5,0.5]
+    :direction [0,0,1]
+    :target [0,0,0]
+    :lens 50
+    :frontClipping 0
+    :backClipping 0
+    :twist 0
+    :mode 0
+   }
+)
+
+(defn ViewByWindow [leftBottom rightTop]
+  (merge (View)
+    {
+     :width (Math/abs (- (nth rightTop 0) (nth leftBottom 0)))
+     :height (Math/abs (- (nth rightTop 1) (nth leftBottom 1)))
+     :center [(* 0.5 (+ (nth rightTop 0) (nth leftBottom 0))) (* 0.5 (+ (nth rightTop 1) (nth leftBottom 1)))]
+    }
+  )
+)
+
 (defn addItem [e key item]
   (assoc e key (conj (key e) item)))
 
@@ -434,3 +462,21 @@
   )
 )
 
+(defmethod generate :view [v]
+  (join (nextline) [
+        "0" "VIEW"
+        "2" (:name v)
+        "70" (:flag v)
+        "40" (:height v)
+        (point (:center v))
+        "41" (:width v)
+        (point (:direction v) 1)
+        (point (:target v) 2)
+        "42" (:lens v)
+        "43" (:frontClipping v)
+        "44" (:backClipping v)
+        "50" (:twist v)
+        "71" (:mode v)
+        ]
+  )
+)

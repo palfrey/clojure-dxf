@@ -117,3 +117,11 @@
 (deftest block
   (let [b (assoc (Block) :name "test")]
     (is (cmpDxf (addItem (Drawing) :blocks b) "block.py"))))
+
+(deftest view
+  (let [
+        v (assoc (View) :name "Normal")
+        vw (assoc (ViewByWindow [1,0] [2,1]) :name "Window")
+        ]
+    (is (cmpDxf (assoc (Drawing) :views [v vw]) "view.py"))))
+
