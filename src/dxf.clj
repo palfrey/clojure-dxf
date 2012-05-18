@@ -151,11 +151,16 @@
   )
 )
 
+; width = number, or width = list [width_start=None, width_end=None]
+; for 2d-polyline: points = [ [x, y, z, width_start=None, width_end=None, bulge=0 or None], ...]
+; for 3d-polyline: points = [ [x, y, z], ...]
+; for polyface: points and faces
 (defn Polyline []
   (merge (Entity)
     {
      :kind :polyline
 	 :points []
+     :faces []
      :org_point [0,0,0]
      :flag 0
      :width nil
@@ -508,8 +513,8 @@
   (let [
         mesh (> (bit-and (:flag p) POLYFACE_MESH) 0)
         polyface mesh
-        pts (if mesh (nth (:points p) 0) (:points p))
-        faces (if mesh (nth (:points p) 1) [])
+        pts (:points p)
+        faces (:faces p)
         l2d (not (and
                    mesh
                    (> (bit-and (:flag p) POLYLINE_3D) 0)))
@@ -577,8 +582,8 @@
         (if (> (count faces) 0)
           (join (nextline)
             (for [f faces] 
-              (join (nextline) [
-                "0" "FVERTEX"
+              (join (nextline) (filter (complement nil?) [
+                "0" "VERTEX"
                 "8" (:layer p)
                 (point (:org_point p))
                 "70" "128"
@@ -587,8 +592,9 @@
                 "73" (nth f 2)
                 (if (= (count f) 4)
                   (str "74" (nextline) (nth f 3) (nextline))
+                  nil
                 )
-              ])
+              ]))
             )
           )
           nil

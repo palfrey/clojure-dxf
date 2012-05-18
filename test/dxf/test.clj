@@ -135,3 +135,13 @@
         ]
     (is (cmpDxf (addItem (Drawing) :entities p) "polyline.py"))))
 
+(deftest polymesh
+  (let [p (merge (Polyline)
+            {
+              :points [[1,1,1],[2,1,1],[2,2,1],[1,2,1]]
+              :faces [[1,1,1],[2,1,1],[2,2,1],[1,2,1]]
+              :flag POLYFACE_MESH
+              :color 1
+            })
+        ]
+    (is (cmpDxf (addItem (Drawing) :entities p) "polymesh.py"))))
