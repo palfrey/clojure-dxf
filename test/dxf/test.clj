@@ -125,3 +125,13 @@
         ]
     (is (cmpDxf (assoc (Drawing) :views [v vw]) "view.py"))))
 
+(deftest polyline
+  (let [p (merge (Polyline)
+            {
+              :points [[1,1,1],[2,1,1],[2,2,1],[1,2,1]]
+              :flag CLOSED
+              :color 1
+            })
+        ]
+    (is (cmpDxf (addItem (Drawing) :entities p) "polyline.py"))))
+

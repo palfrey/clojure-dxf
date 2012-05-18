@@ -151,6 +151,28 @@
   )
 )
 
+(defn Polyline []
+  (merge (Entity)
+    {
+     :kind :polyline
+	 :points []
+     :org_point [0,0,0]
+     :flag 0
+     :width nil
+    }
+  )
+)
+
+; polyline flags
+(def CLOSED 1)                        ; This is a closed polyline (or a polygon mesh closed in the M direction)
+(def CURVE_FIT 2)                     ; Curve-fit vertices have been added
+(def SPLINE_FIT 4)                    ; Spline-fit vertices have been added
+(def POLYLINE_3D 8)                   ; This is a 3D polyline
+(def POLYGON_MESH 16)                 ; This is a 3D polygon mesh
+(def CLOSED_N 32)                     ; The polygon mesh is closed in the N direction
+(def POLYFACE_MESH 64)                ; The polyline is a polyface mesh
+(def CONTINOUS_LINETYPE_PATTERN 128)  ; The linetype pattern is generated continuously around the vertices of this polyline
+
 (defn addItem [e key item]
   (assoc e key (conj (key e) item)))
 
@@ -204,17 +226,18 @@
 (defn point
   ([x] (point x 0))
   ([x index]
-  (join (nextline)
-        (map #(str (first %) (nextline) (last %))
-             (map 
-               #(vector
-                  (+ (* (+ % 1) 10) index)
-                  (nth x %)
-                )
-              (range (count x))
-             )
-        )
-  ))
+    (join (nextline)
+      (map #(str (first %) (nextline) (second %))
+         (map 
+            #(vector
+              (+ (* (+ % 1) 10) index)
+              (nth x %)
+            )
+            (range (count x))
+         )
+      )
+    )
+  )
 )
 
 (defn points [p]
@@ -480,3 +503,99 @@
         ]
   )
 )
+
+(defmethod generate :polyline [p]
+  (let [
+        mesh (> (bit-and (:flag p) POLYFACE_MESH) 0)
+        polyface mesh
+        pts (if mesh (nth (:points p) 0) (:points p))
+        faces (if mesh (nth (:points p) 1) [])
+        l2d (not (and
+                   mesh
+                   (> (bit-and (:flag p) POLYLINE_3D) 0)))
+        width (if
+                (and l2d (contains-not-null p :width))
+                (if
+                  (seq? (:width p))
+                  (:width p)
+                  [(:width p) (:width p)]
+                )
+                (:width p)
+              )
+        ]
+      (join (nextline) (filter (complement nil?) [
+		"0" "POLYLINE"
+        (common p)
+        "70" (:flag p)
+		"66" "1"
+        (point (:org_point p))
+        (if polyface
+          (join (nextline) [
+			"71" (count pts)
+            "72" (count faces)
+          ])
+          (if (and l2d (contains-not-null p :width))
+            (join (nextline) [
+              "40" (nth width 0)
+              "41" (nth width 1)
+            ])
+            nil
+          )
+        )
+        (join (nextline)
+          (for [pt pts]
+            (join (nextline) (filter (complement nil?) [
+              "0" "VERTEX"
+              "8" (:layer p)
+              (if polyface
+                  (join (nextline) [
+                    (point (subvec pt 0 3))
+                    "70" "192"
+                  ])
+                  (if l2d
+                    (str
+                      (point (subvec pt 0 2))
+                      (if (> (count pt) 4)
+                        (str
+                          (if (nil? (nth pt 3)) (str (nextline) "40" (nextline) (nth pt 3)))
+                          (if (nil? (nth pt 4)) (str (nextline) "41" (nextline) (nth pt 4))) 
+                        )
+                        ""
+                      )
+                      (if (= (count pt) 6) 
+                          (if (nil? (nth pt 5)) (str (nextline) "42" (nextline) (nth pt 5)) "")
+                          ""
+                      )
+                    )
+                    (point (subvec pt 0 3))
+                  )
+                )
+              ])
+            )
+          )
+        )
+        (if (> (count faces) 0)
+          (join (nextline)
+            (for [f faces] 
+              (join (nextline) [
+                "0" "FVERTEX"
+                "8" (:layer p)
+                (point (:org_point p))
+                "70" "128"
+                "71" (nth f 0)
+                "72" (nth f 1)
+                "73" (nth f 2)
+                (if (= (count f) 4)
+                  (str "74" (nextline) (nth f 3) (nextline))
+                )
+              ])
+            )
+          )
+          nil
+        )
+		"0" "SEQEND"
+		"8" (:layer p)
+      ]
+    )
+  )
+))
